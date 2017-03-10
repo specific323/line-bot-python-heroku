@@ -12,15 +12,13 @@
 #  License for the specific language governing permissions and limitations
 #  under the License.
 
-from __future__ import unicode_literals
-
 import os
 import sys
 from argparse import ArgumentParser
 
 from flask import Flask, request, abort
 from linebot import (
-    LineBotApi, WebhookParser
+    LineBotApi, WebhookHandler
 )
 from linebot.exceptions import (
     InvalidSignatureError
@@ -32,8 +30,8 @@ from linebot.models import (
 app = Flask(__name__)
 
 # get channel_secret and channel_access_token from your environment variable
-channel_secret = os.getenv('935fcc42269a80c3fb5679b92bb7e7b0', None)
-channel_access_token = os.getenv('7VsCEpcmc1iZ4MQ6PFyuTPDJtO1FXKOTjKVksySsut4ypcCJiQgOEjYTYK1voX89N3yRK0pLzptV3oL5HCY6L1fbwijR5LXwZ3FjVWjoL6Wri9j+y4PZdwE9cwvfqbu2OTPSFRxqd5acxV6aFqMiYwdB04t89/1O/w1cDnyilFU=', None)
+channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
+channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
 if channel_secret is None:
     print('Specify LINE_CHANNEL_SECRET as environment variable.')
     sys.exit(1)
@@ -42,36 +40,33 @@ if channel_access_token is None:
     sys.exit(1)
 
 line_bot_api = LineBotApi(channel_access_token)
-parser = WebhookParser(channel_secret)
+handler = WebhookHandler(channel_secret)
 
 
 @app.route("/callback", methods=['POST'])
 def callback():
+    # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
 
     # get request body as text
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
 
-    # parse webhook body
+    # handle webhook body
     try:
-        events = parser.parse(body, signature)
+        handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
 
-    # if event is MessageEvent and message is TextMessage, then echo text
-    for event in events:
-        if not isinstance(event, MessageEvent):
-            continue
-        if not isinstance(event.message, TextMessage):
-            continue
-
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=event.message.text)
-        )
-
     return 'OK'
+
+
+@handler.add(MessageEvent, message=TextMessage)
+def message_text(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=event.message.text)
+    )
 
 
 if __name__ == "__main__":
