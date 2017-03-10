@@ -1,1 +1,1 @@
-web: gunicorn app:app --log-file -
+web: gunicorn Shabette_Yukko_pro.wsgi bot:app --log-file -
