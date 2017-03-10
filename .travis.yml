@@ -1,11 +1,11 @@
-language: go
+language: python
 
-go:
-    - 1.7
-    - tip
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
 
-before_install:
+install: pip install tox-travis
 
-script:
-    - go test -bench=. -benchmem ./...
-    #- sh ./install_all_cmd.sh
+script: tox

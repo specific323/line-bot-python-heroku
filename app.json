@@ -1,14 +1,16 @@
 {
-  "name": "LineBotTemplate",
-  "description": "Line Bot API template",
-  "repository": "https://github.com/kkdai/LineBotTemplate",
-  "keywords": ["Line", "go", "static"],
-  "buildpacks": [
-    {
-      "url": "https://github.com/kr/heroku-buildpack-go.git"
-    },
-    {
-      "url": "heroku/go"
+    "name": "flask echo: LINE Messaging API",
+    "description": "This is a sample application for the LINE Messaging API",
+    "keywords": ["chatbot", "line", "python"],
+    "repository": "https://github.com/krrrr38/line-bot-sdk-python",
+    "env": {
+        "LINE_CHANNEL_ACCESS_TOKEN": {
+            "description": "LINE bot Channel access token from the Channel Console",
+            "required":  true
+        },
+        "LINE_CHANNEL_SECRET": {
+            "description": "LINE bot Channel secret from the Channel Console",
+            "required":  true
+        }
     }
-  ]
 }

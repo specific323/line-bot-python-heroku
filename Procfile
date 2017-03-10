@@ -1,2 +1,1 @@
-web: LineBotTemplate
-
+web: gunicorn app:app --log-file -
